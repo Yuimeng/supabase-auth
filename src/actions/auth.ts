@@ -95,3 +95,29 @@ export async function signOut() {
   revalidatePath('/', 'layout')
   redirect('/login')
 }
+
+export async function signInWithGithub() {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    },
+  })
+  if (data.url) {
+    redirect(data.url)
+  }
+}
+
+export async function linkGithub() {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.linkIdentity({
+    provider: 'github',
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    },
+  })
+  if (data.url) {
+    redirect(data.url)
+  }
+}
