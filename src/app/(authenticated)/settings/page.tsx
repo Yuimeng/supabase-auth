@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { linkGithub } from '@/actions/auth'
+import { EditProfileForm } from '@/components/profile/edit-profile-form'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -24,16 +25,15 @@ export default async function SettingsPage() {
 
       <section className="rounded-lg border p-6">
         <h2 className="mb-4 text-lg font-semibold">Profile</h2>
-        <dl className="space-y-2 text-sm">
-          <div className="flex gap-2">
-            <dt className="w-24 text-gray-500">Username</dt>
-            <dd>{profile?.username}</dd>
-          </div>
-          <div className="flex gap-2">
-            <dt className="w-24 text-gray-500">Email</dt>
-            <dd>{user.email}</dd>
-          </div>
-        </dl>
+        <EditProfileForm
+          currentUsername={profile?.username ?? ''}
+          currentAvatarUrl={profile?.avatar_url ?? null}
+        />
+        <div className="mt-4 border-t pt-4">
+          <p className="text-sm text-gray-500">
+            <span className="font-medium">Email:</span> {user.email}
+          </p>
+        </div>
       </section>
 
       <section className="rounded-lg border p-6">
