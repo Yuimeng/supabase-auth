@@ -13,9 +13,16 @@ export async function createClient() {
           return cookieStore.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // `setAll` is called during `getUser()` when the session is stale.
+            // In Server Components, `cookieStore.set()` throws because cookies
+            // can only be modified in a Server Action or Route Handler.
+            // The middleware handles session refresh — this is expected.
+          }
         },
       },
     }
