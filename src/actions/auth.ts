@@ -16,7 +16,7 @@ export async function signUp(
   const confirmPassword = formData.get('confirmPassword') as string
 
   // Server-side validation
-  if (!email || !password || !username) {
+  if (!email || !password || !username || !confirmPassword) {
     return { error: 'All fields are required' }
   }
 
