@@ -6,13 +6,22 @@ export default async function HomePage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username')
+    .select('username, avatar_url')
     .eq('id', user?.id)
     .single()
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Welcome, {profile?.username}!</h1>
+      <h1 className="flex items-center gap-3 text-3xl font-bold">
+        {profile?.avatar_url && (
+          <img
+            src={profile.avatar_url}
+            alt="Avatar"
+            className="h-10 w-10 rounded-full object-cover"
+          />
+        )}
+        Welcome, {profile?.username}!
+      </h1>
       <p className="mt-2 text-gray-600">You are signed in as {user?.email}</p>
       <div className="mt-8">
         <a
