@@ -98,12 +98,15 @@ export async function signOut() {
 
 export async function signInWithGithub() {
   const supabase = await createClient()
-  const { data } = await supabase.auth.signInWithOAuth({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
     },
   })
+  if (error) {
+    throw new Error(error.message)
+  }
   if (data.url) {
     redirect(data.url)
   }
@@ -111,12 +114,15 @@ export async function signInWithGithub() {
 
 export async function linkGithub() {
   const supabase = await createClient()
-  const { data } = await supabase.auth.linkIdentity({
+  const { data, error } = await supabase.auth.linkIdentity({
     provider: 'github',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/settings`,
     },
   })
+  if (error) {
+    throw new Error(error.message)
+  }
   if (data.url) {
     redirect(data.url)
   }
