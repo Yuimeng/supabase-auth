@@ -3,14 +3,13 @@
 import { useActionState } from 'react'
 import { signIn } from '@/actions/auth'
 import { SubmitButton } from '@/components/ui/submit-button'
-
 export function LoginForm() {
   const [state, action] = useActionState(signIn, { error: null })
 
   return (
-    <form action={action} className="space-y-4">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+    <form action={action} className="space-y-5">
+      <div className="space-y-1.5">
+        <label htmlFor="email" className="text-[11px] font-medium tracking-[0.1em] text-text-muted uppercase">
           Email
         </label>
         <input
@@ -18,11 +17,12 @@ export function LoginForm() {
           name="email"
           type="email"
           required
-          className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+          className="block w-full rounded-lg border border-border-primary bg-bg-elevated px-3.5 py-2.5 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/50"
+          placeholder="you@example.com"
         />
       </div>
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+      <div className="space-y-1.5">
+        <label htmlFor="password" className="text-[11px] font-medium tracking-[0.1em] text-text-muted uppercase">
           Password
         </label>
         <input
@@ -30,16 +30,19 @@ export function LoginForm() {
           name="password"
           type="password"
           required
-          className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+          className="block w-full rounded-lg border border-border-primary bg-bg-elevated px-3.5 py-2.5 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/50"
+          placeholder="••••••••"
         />
       </div>
       {state?.error && (
-        <p className="text-sm text-red-600">{state.error}</p>
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
+          <p className="text-sm text-red-400">{state.error}</p>
+        </div>
       )}
       <SubmitButton>Sign In</SubmitButton>
-      <p className="text-center text-sm text-gray-600">
+      <p className="text-center text-sm text-text-muted">
         Don&apos;t have an account?{' '}
-        <a href="/register" className="text-blue-600 hover:underline">
+        <a href="/register" className="font-medium text-accent transition-colors hover:text-accent-hover">
           Sign up
         </a>
       </p>

@@ -15,21 +15,23 @@ export default async function AuthenticatedLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-          <span className="font-semibold">Supabase Auth</span>
+    <div className="min-h-screen bg-grid">
+      <header className="border-b border-border-primary/50">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
+          <span className="font-heading text-xs font-semibold tracking-[0.25em] text-text-muted uppercase">
+            Studio
+          </span>
           <form action={signOut}>
             <button
               type="submit"
-              className="text-sm text-gray-600 hover:text-gray-900"
+              className="text-sm text-text-muted transition-colors hover:text-text-primary"
             >
-              Sign Out
+              Sign out
             </button>
           </form>
         </div>
       </header>
-      <main className="mx-auto max-w-4xl px-4 py-8">{children}</main>
+      <main className="mx-auto max-w-2xl px-6 py-12">{children}</main>
     </div>
   )
 }
