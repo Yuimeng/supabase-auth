@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { ContactForm } from '@/components/contact/contact-form'
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -9,6 +10,12 @@ export default async function HomePage() {
     .select('username, avatar_url')
     .eq('id', user?.id)
     .single()
+
+  const { data: messages } = await supabase
+    .from('messages')
+    .select('id, contact_info, message, created_at')
+    .eq('user_id', user?.id)
+    .order('created_at', { ascending: false })
 
   return (
     <div className="space-y-8">
@@ -27,6 +34,8 @@ export default async function HomePage() {
           <p className="mt-1 text-sm text-text-muted">{user?.email}</p>
         </div>
       </div>
+
+      <ContactForm initialMessages={messages ?? []} />
     </div>
   )
 }
