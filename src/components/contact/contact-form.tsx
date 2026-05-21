@@ -33,6 +33,7 @@ export function ContactForm({ initialMessages }: { initialMessages: Message[] })
               id="contactInfo"
               name="contactInfo"
               required
+              maxLength={100}
               rows={2}
               className="mt-1.5 block w-full rounded-lg border border-border-primary bg-bg-surface px-3.5 py-2.5 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/50 resize-none"
               placeholder="WeChat, phone, email, etc."
@@ -50,6 +51,7 @@ export function ContactForm({ initialMessages }: { initialMessages: Message[] })
               id="message"
               name="message"
               required
+              maxLength={1000}
               rows={3}
               className="mt-1.5 block w-full rounded-lg border border-border-primary bg-bg-surface px-3.5 py-2.5 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/50 resize-none"
               placeholder="Write your message..."
@@ -83,13 +85,19 @@ export function ContactForm({ initialMessages }: { initialMessages: Message[] })
                 className="rounded-xl border border-border-primary bg-bg-surface p-5"
               >
                 <p className="text-xs text-text-muted">
-                  {new Date(msg.created_at).toLocaleDateString('zh-CN', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {(() => {
+                    try {
+                      return new Date(msg.created_at).toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    } catch {
+                      return msg.created_at
+                    }
+                  })()}
                 </p>
                 <p className="mt-2 text-sm text-text-secondary">{msg.contact_info}</p>
                 <p className="mt-1 text-sm text-text-primary">{msg.message}</p>
