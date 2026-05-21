@@ -15,3 +15,5 @@ create policy "Users can view own messages"
 create policy "Users can insert own messages"
   on public.messages for insert
   with check (auth.uid() = user_id);
+
+create index idx_messages_user_id on public.messages(user_id);
