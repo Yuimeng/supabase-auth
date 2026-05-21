@@ -87,7 +87,7 @@ export function ContactForm({ initialMessages }: { initialMessages: Message[] })
                 <p className="text-xs text-text-muted">
                   {(() => {
                     try {
-                      return new Date(msg.created_at).toLocaleString('zh-CN', {
+                      return new Date(msg.created_at).toLocaleString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
