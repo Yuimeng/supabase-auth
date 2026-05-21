@@ -18,7 +18,15 @@ export async function createMessage(
   const message = (formData.get('message') as string)?.trim()
 
   if (!contactInfo || !message) {
-    return { error: '联系方式 and 留言 are required' }
+    return { error: 'Contact info and message are required' }
+  }
+
+  if (contactInfo.length > 100) {
+    return { error: 'Contact info must be 100 characters or less' }
+  }
+
+  if (message.length > 1000) {
+    return { error: 'Message must be 1000 characters or less' }
   }
 
   const { error } = await supabase
@@ -33,6 +41,6 @@ export async function createMessage(
     return { error: `Failed to save: ${error.message}` }
   }
 
-  revalidatePath('/')
+  revalidatePath('/', 'layout')
   return { error: null }
 }
