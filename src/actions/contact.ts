@@ -44,3 +44,33 @@ export async function createMessage(
   revalidatePath('/', 'layout')
   return { error: null }
 }
+
+export async function deleteMessage(
+  _prev: { error: string | null },
+  formData: FormData
+): Promise<{ error: string | null }> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) {
+    return { error: 'Not authenticated' }
+  }
+
+  const id = formData.get('id') as string
+  if (!id) {
+    return { error: 'Message ID is required' }
+  }
+
+  const { error } = await supabase
+    .from('messages')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { error: `Failed to delete: ${error.message}` }
+  }
+
+  revalidatePath('/', 'layout')
+  return { error: null }
+}
