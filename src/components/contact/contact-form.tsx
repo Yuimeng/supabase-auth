@@ -19,7 +19,13 @@ function DeleteConfirmModal({
   onClose: () => void
 }) {
   const [deleteState, deleteAction, isPending] = useActionState(deleteMessage, { error: null })
+  const [animate, setAnimate] = useState<'entering' | 'open' | 'closing'>('entering')
   const prevIsPending = useRef(false)
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setAnimate('open'))
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -33,17 +39,29 @@ function DeleteConfirmModal({
     prevIsPending.current = isPending
   }, [isPending, deleteState.error, onClose])
 
+  const handleClose = () => {
+    if (animate === 'closing') return
+    setAnimate('closing')
+    setTimeout(onClose, 150)
+  }
+
+  const isOpen = animate === 'open'
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-      onKeyDown={(e) => e.key === 'Escape' && onClose()}
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-150 ease-out ${
+        isOpen ? 'bg-black/60 backdrop-blur-sm' : 'bg-black/0 backdrop-blur-none'
+      }`}
+      onClick={handleClose}
+      onKeyDown={(e) => e.key === 'Escape' && handleClose()}
       role="dialog"
       aria-modal="true"
       aria-labelledby="delete-dialog-title"
     >
       <div
-        className="w-full max-w-sm rounded-xl border border-border-primary bg-bg-elevated p-6 shadow-2xl"
+        className={`w-full max-w-sm rounded-xl border border-border-primary bg-bg-elevated p-6 shadow-2xl transition-all duration-150 ease-out ${
+          isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         <h3 id="delete-dialog-title" className="font-heading text-base font-light tracking-tight text-text-primary">
@@ -62,7 +80,7 @@ function DeleteConfirmModal({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-lg px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-border-primary"
           >
             Cancel
