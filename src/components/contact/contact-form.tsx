@@ -22,6 +22,11 @@ function DeleteConfirmModal({
   const prevIsPending = useRef(false)
 
   useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  useEffect(() => {
     if (prevIsPending.current && !isPending && deleteState.error === null) {
       onClose()
     }
