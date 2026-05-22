@@ -1,7 +1,7 @@
 'use client'
 
-import { useActionState } from 'react'
-import { createMessage } from '@/actions/contact'
+import { useActionState, useState } from 'react'
+import { createMessage, deleteMessage } from '@/actions/contact'
 import { SubmitButton } from '@/components/ui/submit-button'
 
 type Message = {
@@ -13,6 +13,8 @@ type Message = {
 
 export function ContactForm({ initialMessages }: { initialMessages: Message[] }) {
   const [state, action] = useActionState(createMessage, { error: null })
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
+  const [deleteState, deleteAction] = useActionState(deleteMessage, { error: null })
 
   return (
     <div className="space-y-8">
@@ -101,11 +103,62 @@ export function ContactForm({ initialMessages }: { initialMessages: Message[] })
                 </p>
                 <p className="mt-2 text-sm text-text-secondary">{msg.contact_info}</p>
                 <p className="mt-1 text-sm text-text-primary">{msg.message}</p>
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDeleteId(msg.id)}
+                    className="rounded-md px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {confirmDeleteId !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setConfirmDeleteId(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-xl border border-border-primary bg-bg-elevated p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-heading text-base font-light tracking-tight text-text-primary">
+              Confirm Delete
+            </h3>
+            <p className="mt-2 text-sm text-text-secondary">
+              Are you sure you want to delete this message?
+            </p>
+
+            <form action={deleteAction} className="mt-6 flex items-center justify-end gap-3">
+              <input type="hidden" name="id" value={confirmDeleteId} />
+
+              {deleteState?.error && (
+                <p className="mr-auto text-xs text-red-400">{deleteState.error}</p>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setConfirmDeleteId(null)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-border-primary"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
