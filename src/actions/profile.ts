@@ -39,9 +39,14 @@ export async function updateProfile(
 
   let avatarUrl: string | undefined
 
+  const AVATAR_MAX_SIZE = parseInt(process.env.NEXT_PUBLIC_AVATAR_MAX_SIZE ?? '') || 2 * 1024 * 1024
+
   if (avatarFile && avatarFile.size > 0) {
     if (!avatarFile.type.startsWith('image/')) {
       return { error: 'Avatar must be an image file' }
+    }
+    if (avatarFile.size > AVATAR_MAX_SIZE) {
+      return { error: `Avatar must be ${Math.round(AVATAR_MAX_SIZE / 1024 / 1024 * 10) / 10}MB or less` }
     }
 
     const fileExt = avatarFile.name.split('.').pop() ?? 'jpg'
