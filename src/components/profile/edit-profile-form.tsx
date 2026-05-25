@@ -1,8 +1,9 @@
 'use client'
 
-import { useActionState, useRef, useState } from 'react'
+import { useActionState, useCallback, useEffect, useRef, useState } from 'react'
 import { updateProfile } from '@/actions/profile'
 import { SubmitButton } from '@/components/ui/submit-button'
+import { Toast } from '@/components/ui/toast'
 
 export function EditProfileForm({
   currentUsername,
@@ -13,9 +14,20 @@ export function EditProfileForm({
   currentEmail: string
   currentAvatarUrl: string | null
 }) {
-  const [state, action] = useActionState(updateProfile, { error: null })
+  const [state, action, isPending] = useActionState(updateProfile, { error: null })
   const [preview, setPreview] = useState<string | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const prevIsPending = useRef(false)
+
+  const onCloseSuccess = useCallback(() => setShowSuccess(false), [])
+
+  useEffect(() => {
+    if (prevIsPending.current && !isPending && state.error === null) {
+      setShowSuccess(true)
+    }
+    prevIsPending.current = isPending
+  }, [isPending, state.error])
 
   const handleFileChange = () => {
     const file = fileRef.current?.files?.[0]
@@ -26,7 +38,9 @@ export function EditProfileForm({
   const displayUrl = preview || currentAvatarUrl
 
   return (
-    <form action={action} className="space-y-6">
+    <>
+      <Toast message="Profile updated" show={showSuccess} onClose={onCloseSuccess} />
+      <form action={action} className="space-y-6">
       <div className="flex items-start gap-6">
         <div className="relative shrink-0">
           <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-2 border-border-primary">
@@ -97,5 +111,6 @@ export function EditProfileForm({
 
       <SubmitButton />
     </form>
+    </>
   )
 }

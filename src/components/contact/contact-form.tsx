@@ -1,8 +1,9 @@
 'use client'
 
-import { useActionState, useState, useEffect, useRef } from 'react'
+import { useActionState, useCallback, useState, useEffect, useRef } from 'react'
 import { createMessage, deleteMessage } from '@/actions/contact'
 import { SubmitButton } from '@/components/ui/submit-button'
+import { Toast } from '@/components/ui/toast'
 
 type Message = {
   id: number
@@ -14,9 +15,11 @@ type Message = {
 function DeleteConfirmModal({
   messageId,
   onClose,
+  onDeleted,
 }: {
   messageId: number
   onClose: () => void
+  onDeleted: () => void
 }) {
   const [deleteState, deleteAction, isPending] = useActionState(deleteMessage, { error: null })
   const [animate, setAnimate] = useState<'entering' | 'open' | 'closing'>('entering')
@@ -34,10 +37,11 @@ function DeleteConfirmModal({
 
   useEffect(() => {
     if (prevIsPending.current && !isPending && deleteState.error === null) {
+      onDeleted()
       onClose()
     }
     prevIsPending.current = isPending
-  }, [isPending, deleteState.error, onClose])
+  }, [isPending, deleteState.error, onClose, onDeleted])
 
   const handleClose = () => {
     if (animate === 'closing') return
@@ -100,17 +104,36 @@ function DeleteConfirmModal({
 }
 
 export function ContactForm({ initialMessages }: { initialMessages: Message[] }) {
-  const [state, action] = useActionState(createMessage, { error: null })
+  const [state, action, isPending] = useActionState(createMessage, { error: null })
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const prevIsPending = useRef(false)
+
+  const onCloseSuccess = useCallback(() => setShowSuccess(false), [])
+  const onCloseDeleteSuccess = useCallback(() => setShowDeleteSuccess(false), [])
+  const onDeleted = useCallback(() => setShowDeleteSuccess(true), [])
+
+  useEffect(() => {
+    if (prevIsPending.current && !isPending && state.error === null) {
+      setShowSuccess(true)
+      formRef.current?.reset()
+    }
+    prevIsPending.current = isPending
+  }, [isPending, state.error])
 
   return (
-    <div className="space-y-8">
+    <>
+      <Toast message="Message sent" show={showSuccess} onClose={onCloseSuccess} />
+      <Toast message="Message deleted" show={showDeleteSuccess} onClose={onCloseDeleteSuccess} />
+      <div className="space-y-8">
       <div className="rounded-xl border border-border-primary bg-bg-elevated p-6">
         <h2 className="mb-5 font-heading text-lg font-light tracking-tight text-text-primary">
           Contact &amp; Message
         </h2>
 
-        <form action={action} className="space-y-5">
+        <form ref={formRef} action={action} className="space-y-5">
           <div>
             <label
               htmlFor="contactInfo"
@@ -209,8 +232,10 @@ export function ContactForm({ initialMessages }: { initialMessages: Message[] })
         <DeleteConfirmModal
           messageId={confirmDeleteId}
           onClose={() => setConfirmDeleteId(null)}
+          onDeleted={onDeleted}
         />
       )}
     </div>
+    </>
   )
 }
